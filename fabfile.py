@@ -52,7 +52,7 @@ RSYNC_EXCLUDE = (
     '*.db',
     )
 env.project = 'commcare-hq'
-env.code_repo = 'git://github.com/dimagi/commcare-hq.git'
+env.code_repo = 'git@github.com:gmimano/commcaretest.git'
 
 if not hasattr(env, 'code_branch'):
     print ("code_branch not specified, using 'master'. "
@@ -196,7 +196,39 @@ def india():
     env.es_endpoint = 'localhost'
     env.flower_port = 5555
 
+@task
+def moveit():
+    """Our production server for moveit."""
+    env.home = '/home/cchq/'
+    env.environment = 'moveit'
+    env.sudo_user = 'cchq'
+    env.hosts = ['79.143.186.65']
+    env.user = prompt("Username: ", default=env.user)
+    env.django_port = '8001'
+    env.should_migrate = True
 
+    _setup_path()
+    env.virtualenv_root = posixpath.join(env.home, '.virtualenvs/commcarehq')
+    env.virtualenv_root_preindex = posixpath.join(env.home, '.virtualenvs/commcarehq_preindex')
+
+    env.roledefs = {
+        'couch': [],
+        'pg': [],
+        'rabbitmq': [],
+        'django_celery': [],
+        'sms_queue': [],
+        'django_app': [],
+        'django_pillowtop': [],
+        'formsplayer': [],
+        'staticfiles': [],
+        'lb': [],
+        'deploy': [],
+
+        'django_monolith': ['79.143.186.65'],
+    }
+    env.roles = ['django_monolith']
+    env.es_endpoint = 'localhost'
+    env.flower_port = 5555
 
 @task
 def zambia():
